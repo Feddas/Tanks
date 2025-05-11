@@ -19,10 +19,19 @@
 *.vscode
 *.vsconfig
 
+#Custom
 /Builds/*
-DontCommit*
-
-# LFS
 /DontCommit/*
 /Assets/DontCommit*
 /Assets/ShareInputSystemDevice*
+
+# LFS
+*.wav
+*.exr
+*.ogg
+*.png
+*.tif
+*.aif
+*.fbx
+/Assets/_Tanks/Art/Fonts/*
+/Assets/_Tanks/Settings/TextMesh Pro/*
