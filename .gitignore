@@ -1,0 +1,28 @@
+# General
+/Library/*
+# pidb files are only for code completion caching data according to:
+# http://stackoverflow.com/questions/1022111/what-are-monodevelops-pidb-files
+*.pidb
+*.userprefs
+/Temp/*
+/Logs/*
+/UserSettings/*
+
+# Visual Studio & its tools
+*.sln
+*.suo
+*.csproj
+*.unityproj
+/[Oo]bj/*
+*.DotSettings
+*.vs
+*.vscode
+*.vsconfig
+
+/Builds/*
+DontCommit*
+
+# LFS
+/DontCommit/*
+/Assets/DontCommit*
+/Assets/ShareInputSystemDevice*
