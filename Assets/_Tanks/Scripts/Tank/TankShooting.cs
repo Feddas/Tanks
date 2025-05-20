@@ -6,6 +6,8 @@ namespace Tanks.Complete
 {
     public class TankShooting : MonoBehaviour
     {
+        private const float defaultMaxDamage = 100;
+
         public Rigidbody m_Shell;                   // Prefab of the shell.
         public Transform m_FireTransform;           // A child of the tank where the shells are spawned.
         public Slider m_AimSlider;                  // A child of the tank that displays the current launch force.
@@ -22,7 +24,7 @@ namespace Tanks.Complete
         public float m_ShotCooldown = 1.0f;         // The time required between 2 shots
         [Header("Shell Properties")]
         [Tooltip("The amount of health removed to a tank if they are exactly on the landing spot of a shell")]
-        public float m_MaxDamage = 100f;                    // The amount of damage done if the explosion is centred on a tank.
+        public float m_MaxDamage = defaultMaxDamage;        // The amount of damage done if the explosion is centred on a tank.
         [Tooltip("The force of the explosion at the shell position. It is in newton, so it need to be high, so keep it 500 and above")]
         public float m_ExplosionForce = 1000f;              // The amount of force added to a tank at the centre of the explosion.
         [Tooltip("The radius of the explosion in Unity unit. Force decrease with distance to the center, and an tank further than this from the shell explosion won't be impacted by the explosion")]
@@ -198,9 +200,10 @@ namespace Tanks.Complete
             // Set the fired flag so only Fire is only called once.
             m_Fired = true;
 
-            // Create an instance of the shell and store a reference to it's rigidbody.
+            // Create an instance of the shell and store a reference to its rigidbody.
             Rigidbody shellInstance =
                 Instantiate (m_Shell, m_FireTransform.position, m_FireTransform.rotation) as Rigidbody;
+            shellInstance.transform.localScale = Vector3.one * m_MaxDamage / defaultMaxDamage;
 
             // Set the shell's velocity to the launch force in the fire position's forward direction.
             shellInstance.linearVelocity = m_CurrentLaunchForce * m_FireTransform.forward;
