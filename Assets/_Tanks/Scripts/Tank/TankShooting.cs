@@ -49,7 +49,13 @@ namespace Tanks.Complete
         private bool m_IsCharging = false;          // Are we currently charging the shot
         private float m_BaseMinLaunchForce;         // The initial value of m_MinLaunchForce
         private float m_ShotCooldownTimer;          // The timer counting down before a shot is allowed again
-        
+
+        private Rigidbody playerRigidBody
+        {
+            get { return _playerRigidBody ?? this.GetComponent<Rigidbody>(); }
+        }
+        private Rigidbody _playerRigidBody;
+
         private void OnEnable()
         {
             // When the tank is turned on, reset the launch force, the UI and the power ups
@@ -151,6 +157,14 @@ namespace Tanks.Complete
         
         void HumanUpdate()
         {
+            //Debug.DrawLine(this.transform.position + Vector3.up, this.transform.position + Vector3.up + playerRigidBody.linearVelocity, Color.green);
+            //Debug.DrawLine(this.transform.position + Vector3.up, this.transform.position + Vector3.up + m_CurrentLaunchForce * m_FireTransform.forward, Color.black);
+            //Vector3 bulletBoost = Vector3.Project(playerRigidBody.linearVelocity, m_FireTransform.forward);
+            //if (Vector3.Dot(bulletBoost.normalized, m_FireTransform.forward.normalized) > 0) // If the dot product is greater than 0, the angle is less than 90 degrees
+            //{
+            //    Debug.DrawLine(this.transform.position + Vector3.up, this.transform.position + Vector3.up + bulletBoost, Color.red);
+            //}
+
             // if there is a cooldown timer, decrement it
             if (m_ShotCooldownTimer > 0.0f)
             {
@@ -216,6 +230,12 @@ namespace Tanks.Complete
 
             // Set the shell's velocity to the launch force in the fire position's forward direction.
             shellInstance.linearVelocity = m_CurrentLaunchForce * m_FireTransform.forward;
+            Vector3 boostFromTankVelocity = Vector3.Project(playerRigidBody.linearVelocity, m_FireTransform.forward);
+            if (Vector3.Dot(boostFromTankVelocity.normalized, m_FireTransform.forward.normalized) > 0) // If the dot product is greater than 0, the angle is less than 90 degrees
+            {
+                // Debug.Log("BOOSTED! by " +  boostFromTankVelocity.magnitude);
+                shellInstance.linearVelocity += boostFromTankVelocity;
+            }
 
             ShellExplosion explosionData = shellInstance.GetComponent<ShellExplosion>();
             explosionData.m_ExplosionForce = m_ExplosionForce;
