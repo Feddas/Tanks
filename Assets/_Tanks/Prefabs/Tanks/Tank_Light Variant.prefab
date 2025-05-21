@@ -86,7 +86,7 @@ PrefabInstance:
     - target: {fileID: 1505067952790833953, guid: eca077da2e865784e887fc808102ff49,
         type: 3}
       propertyPath: m_Name
-      value: Tank_MegaBall Variant
+      value: Tank_Light Variant
       objectReference: {fileID: 0}
     - target: {fileID: 4375579749107738306, guid: eca077da2e865784e887fc808102ff49,
         type: 3}

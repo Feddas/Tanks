@@ -30,6 +30,10 @@ namespace Tanks.Complete
         [Tooltip("The radius of the explosion in Unity unit. Force decrease with distance to the center, and an tank further than this from the shell explosion won't be impacted by the explosion")]
         public float m_ExplosionRadius = 5f;                // The maximum distance away from the explosion tanks can be and are still affected.
 
+        [Tooltip("Enables the gun of the tank to rotate independently of the tanks treads")]
+        public Transform m_TurretMesh;
+        public Transform m_TurretPivot;
+
         [HideInInspector]
         public TankInputUser m_InputUser;           // The Input User component for that tanks. Contains the Input Actions. 
         
@@ -55,6 +59,9 @@ namespace Tanks.Complete
             get { return _playerRigidBody ?? this.GetComponent<Rigidbody>(); }
         }
         private Rigidbody _playerRigidBody;
+
+        /// <summary> The direction the turret will lerp towards </summary>
+        private Vector3 turrentDirectionGoal;
 
         private void OnEnable()
         {
@@ -165,6 +172,8 @@ namespace Tanks.Complete
             //    Debug.DrawLine(this.transform.position + Vector3.up, this.transform.position + Vector3.up + bulletBoost, Color.red);
             //}
 
+            rotateTurret();
+
             // if there is a cooldown timer, decrement it
             if (m_ShotCooldownTimer > 0.0f)
             {
@@ -174,37 +183,57 @@ namespace Tanks.Complete
             // The slider should have a default value of the minimum launch force.
             m_AimSlider.value = m_BaseMinLaunchForce;
 
-            // If the max force has been exceeded and the shell hasn't yet been launched...
-            if (m_CurrentLaunchForce >= m_MaxLaunchForce && !m_Fired)
-            {
-                // ... use the max force and launch the shell.
-                m_CurrentLaunchForce = m_MaxLaunchForce;
-                Fire ();
-            }
             // Otherwise, if the fire button has just started being pressed...
-            else if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
+            if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
             {
                 queueNextBullet();
             }
-            // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
+            // Otherwise, if the fire button is being held
             else if (fireAction.IsPressed())
             {
                 if (m_Fired && m_ShotCooldownTimer <= 0) // button was held down during the entire m_ShotCooldownTimer
                 {
                     queueNextBullet();
                 }
-                else if (false == m_Fired) // Increment the launch force and update the slider.
+                else if (false == m_Fired) // Increment the launch force and update the slider. the shell hasn't been launched yet...
                 {
                     m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
                     m_AimSlider.value = m_CurrentLaunchForce;
+
+                    // If the max force has been exceeded and the shell hasn't yet been launched...
+                    if (m_CurrentLaunchForce >= m_MaxLaunchForce)
+                    {
+                        // ... use the max force and launch the shell.
+                        m_CurrentLaunchForce = m_MaxLaunchForce;
+                        Fire();
+                    }
                 }
             }
             // Otherwise, if the fire button is released and the shell hasn't been launched yet...
             else if (fireAction.WasReleasedThisFrame() && !m_Fired)
             {
                 // ... launch the shell.
-                Fire ();
+                Fire();
             }
+            else if (false == fireAction.IsPressed()) // Otherwise, the fire button has been released
+            {
+                // unlock turrent direction
+                turrentDirectionGoal = this.transform.forward;
+            }
+        }
+
+        private void rotateTurret()
+        {
+            if (m_TurretMesh == null || m_TurretPivot == null)
+            {
+                return;
+            }
+
+            Vector3 newDirection = Vector3.RotateTowards(m_TurretMesh.transform.forward, turrentDirectionGoal, 10 * Time.deltaTime, 0);
+            m_TurretMesh.rotation = m_TurretPivot.rotation = Quaternion.LookRotation(newDirection);
+
+            //Debug.DrawLine(this.transform.position + Vector3.up, this.transform.position + Vector3.up + turrentDirectionGoal * 10, Color.green);
+            //Debug.DrawLine(this.transform.position + Vector3.up, this.transform.position + Vector3.up + newDirection * 10, Color.red);
         }
 
         private void queueNextBullet()
