@@ -6,8 +6,8 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Tanks/Tutorial_Demo/Demo_Scenes/Demo_Game_Jungle.unity
-    guid: 37961ba4d27bd46428d20c2ffe403dc3
+    path: Assets/_Tanks/Scenes/Main.unity
+    guid: ec2bbb1d34398f54598f4125af37b966
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 7fb6c1c790fa04865b379a6e8ccd7e9c,
       type: 3}
