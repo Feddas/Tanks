@@ -170,21 +170,20 @@ namespace Tanks.Complete
             // Otherwise, if the fire button has just started being pressed...
             else if (m_ShotCooldownTimer <= 0 && fireAction.WasPressedThisFrame())
             {
-                // ... reset the fired flag and reset the launch force.
-                m_Fired = false;
-                m_CurrentLaunchForce = m_MinLaunchForce;
-
-                // Change the clip to the charging clip and start it playing.
-                m_ShootingAudio.clip = m_ChargingClip;
-                m_ShootingAudio.Play ();
+                queueNextBullet();
             }
             // Otherwise, if the fire button is being held and the shell hasn't been launched yet...
-            else if (fireAction.IsPressed() && !m_Fired)
+            else if (fireAction.IsPressed())
             {
-                // Increment the launch force and update the slider.
-                m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
-
-                m_AimSlider.value = m_CurrentLaunchForce;
+                if (m_Fired && m_ShotCooldownTimer <= 0) // button was held down during the entire m_ShotCooldownTimer
+                {
+                    queueNextBullet();
+                }
+                else if (false == m_Fired) // Increment the launch force and update the slider.
+                {
+                    m_CurrentLaunchForce += m_ChargeSpeed * Time.deltaTime;
+                    m_AimSlider.value = m_CurrentLaunchForce;
+                }
             }
             // Otherwise, if the fire button is released and the shell hasn't been launched yet...
             else if (fireAction.WasReleasedThisFrame() && !m_Fired)
@@ -194,10 +193,20 @@ namespace Tanks.Complete
             }
         }
 
+        private void queueNextBullet()
+        {
+            // ... reset the fired flag and reset the launch force.
+            m_Fired = false;
+            m_CurrentLaunchForce = m_MinLaunchForce;
+
+            // Change the clip to the charging clip and start it playing.
+            m_ShootingAudio.clip = m_ChargingClip;
+            m_ShootingAudio.Play();
+        }
 
         private void Fire ()
         {
-            // Set the fired flag so only Fire is only called once.
+            // Set the fired flag so Fire is called only once.
             m_Fired = true;
 
             // Create an instance of the shell and store a reference to its rigidbody.
